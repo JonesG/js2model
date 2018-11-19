@@ -63,13 +63,10 @@ public:
 % for v in classDef.variable_defs:
 ${propertyDecl(v)}
 % endfor
-% if include_additional_properties:
-    std::unordered_map<std::string, std::string> additionalProperties;
-% endif
 
 public:
 
-    ${class_name}() = default;
+    ${class_name}();
     ${class_name}(const ${class_name} &other) = default;
     ${class_name}(const rapidjson::Value &value);
 

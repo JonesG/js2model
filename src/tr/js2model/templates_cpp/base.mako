@@ -41,7 +41,7 @@ def normalize_class_name(value):
     return value
 %>\
 <%doc>
-Maps for mapping JSON types to Obj C types.
+Maps for mapping JSON types to C++ types.
 </%doc>\
 <%!
     typeMap = {
@@ -50,6 +50,7 @@ Maps for mapping JSON types to Obj C types.
         'integer': 'int',
         'number':  'float',
         'boolean': 'bool',
+        'array' :  'std::vector',
         'null':	   'void',
         'any':	   'void'
     }
@@ -60,6 +61,7 @@ Maps for mapping JSON types to Obj C types.
         'integer': 'int',
         'number':  'float',
         'boolean': 'bool',
+        'array' :  'std::vector',
         'null':	   'void',
         'any':	   'void'
     }
@@ -70,6 +72,7 @@ Maps for mapping JSON types to Obj C types.
         'integer': False,
         'number':  False,
         'boolean': False,
+        'array' :  True,
         'null':	   True,
         'any':	   True
     }
@@ -104,7 +107,7 @@ def inst_name(value):
 ##        return (varType, isRef)
 ##%>
 <%doc>
-Convert a JSON type to an Objective C type.
+Convert a JSON type to a C++ type.
 </%doc>
 <%!
     def convertType(variableDef, usePrimitives=False):
@@ -121,8 +124,14 @@ Convert a JSON type to an Objective C type.
             isRef = True
 
         if variableDef.isArray:
-             varType = "std::vector<%s>" % cppType
+             if variableDef.schema_type == 'array':
+                varType = "std::vector<std::vector<%s>>" % cppType
+             else:
+                varType = "std::vector<%s>" % cppType
              itemType = cppType
+        elif variableDef.schema_type == 'dict':
+            varType = "std::unordered_map<std::string,%s>" % (variableDef.name + '_t')             
+            itemType = cppType
         else:
              varType = cppType
              itemType = None
@@ -152,6 +161,7 @@ Convert a JSON type to an Objective C type.
 //
 //  ${file_name}
 //
-//  Created by js2Model on ${timestamp}.
+##//  Created by js2Model on ${timestamp}.
+//  Created by js2Model.
 //
 <%block name="code" />
